@@ -2,7 +2,7 @@ USE cinema;
 
 -- 1.
 -- Donner le nombre de films réalisés par Steven Spielberg.
-SELECT count(*) AS "Nb Film"
+SELECT count(*) AS 'nbFilm'
 FROM Film
     JOIN Realisateur
         ON Film.idRealisateur = Realisateur.id
@@ -24,9 +24,9 @@ ORDER BY avgCapacity DESC;
 -- 3. 
 -- Indiquer toutes les séances (nom du cinéma, no de la salle, titre du film) ayant lieu à Yverdon-les-Bains, 
 --  qui coûtent moins de 15 CHF et qui ont lieu en soirée(à partir de 20h).
-SELECT Cinema.nom     AS 'Cinema',
-       Seance.noSalle AS 'N° Salle',
-       Film.titre     AS 'Film',
+SELECT Cinema.nom     AS 'cinema',
+       Seance.noSalle AS 'noSalle',
+       Film.titre     AS 'film',
        Seance.dateHeure,
        Seance.tarif,
        Cinema.localite
@@ -88,3 +88,27 @@ WHERE EXISTS(
     WHERE Cinema.id = Seance.idCinema
     HAVING MAX(Film.annee) - MIN(Film.annee) >= 20
 );
+
+-- 7
+-- Lister les cinémas (nom et localité) projetant des films réalisés par Michael Moore ou
+-- possédant une salle avec une capacité supérieure à 100 places. Utiliser l’opérateur
+-- UNION.
+
+SELECT DISTINCT Cinema.nom,
+                Cinema.localite
+FROM Cinema
+    JOIN Seance
+        ON Cinema.id = Seance.idCinema
+    JOIN Film
+        ON Seance.idFilm = Film.id
+    JOIN Realisateur
+        ON Film.idRealisateur = Realisateur.id
+WHERE Realisateur.prenom = 'Michael'
+    AND Realisateur.nom = 'Moore'
+UNION
+SELECT DISTINCT Cinema.nom,
+                Cinema.localite
+FROM Cinema
+    JOIN Salle
+        ON Cinema.id = Salle.idCinema
+WHERE Salle.capacite > 100
