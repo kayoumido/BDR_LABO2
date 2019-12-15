@@ -51,3 +51,26 @@ FROM Realisateur
         ON Realisateur.id = Film.idRealisateur
 GROUP BY Realisateur.nom, Realisateur.prenom, Realisateur.anneeNaissance
 ORDER BY age, Realisateur.nom, Realisateur.prenom;
+
+-- 5.
+-- Lister le programme complet concernant les films de Michael Moore (date de la séance,
+-- heure de début de la séance, lieu, nom du cinéma, no de la salle, titre du film, tarif).
+SELECT DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date',
+       DATE_FORMAT(Seance.dateHeure, '%H:%i') AS 'heureDebut',
+       Cinema.localite,
+       Cinema.nom,
+       Seance.noSalle,
+       Film.titre,
+       Seance.tarif
+FROM Seance
+    JOIN Film
+        ON Seance.idFilm = Film.id
+    JOIN Realisateur
+        ON Film.idRealisateur = Realisateur.id
+    JOIN Cinema
+        ON Seance.idCinema = Cinema.id
+WHERE Realisateur.nom = 'Moore'
+    AND Realisateur.prenom = 'Michael'
+
+
+
