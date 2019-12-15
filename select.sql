@@ -210,7 +210,8 @@ ORDER BY SUM(Salle.capacite * Seance.tarif * 0.5) DESC LIMIT 20;
 SELECT Cinema.localite,
        Cinema.nom,
        ROUND(AVG(Salle.capacite), 2) AS 'moyenneCapacite',
-       ANY_VALUE(Seance.tarif) IS NOT NULL AS 'aSeanceMoinsDe12Frs'
+       -- on peut utiliser max ou any value ou min c'est égal
+       MAX(Seance.tarif) IS NOT NULL AS 'aSeanceMoinsDe12Frs'
 FROM Cinema
     JOIN Salle
         ON Cinema.id = Salle.idCinema
@@ -219,3 +220,4 @@ FROM Cinema
         AND Salle.noSalle = Seance.noSalle
         AND Seance.tarif < 12
 GROUP BY Cinema.localite, Cinema.nom
+
