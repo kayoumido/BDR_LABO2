@@ -201,3 +201,21 @@ FROM Film
         AND Seance.idCinema = Salle.idCinema
 GROUP BY Film.titre, Film.annee
 ORDER BY SUM(Salle.capacite * Seance.tarif * 0.5) DESC LIMIT 20;
+
+-- 14
+-- Pour chaque cinéma (localité et nom), indiquer le nombre de salles de cinéma, la capacité
+-- moyenne (2 digits de précision) et s'il existe des séances à moins de 12 CHF. Utiliser
+-- un(des) LEFT JOIN (pas de EXISTS, ...)
+
+SELECT Cinema.localite,
+       Cinema.nom,
+       ROUND(AVG(Salle.capacite), 2) AS 'moyenneCapacite',
+       ANY_VALUE(Seance.tarif) IS NOT NULL AS 'aSeanceMoinsDe12Frs'
+FROM Cinema
+    JOIN Salle
+        ON Cinema.id = Salle.idCinema
+    LEFT JOIN Seance
+        ON Salle.idCinema = Seance.idCinema
+        AND Salle.noSalle = Seance.noSalle
+        AND Seance.tarif < 12
+GROUP BY Cinema.localite, Cinema.nom
