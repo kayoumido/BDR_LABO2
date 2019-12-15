@@ -202,6 +202,48 @@ FROM Film
 GROUP BY Film.titre, Film.annee
 ORDER BY SUM(Salle.capacite * Seance.tarif * 0.5) DESC LIMIT 20;
 
+
+-- 13.
+-- Lister tous les films (titre, année, nom et prénom du réalisateur) qui sont projetés dans un
+-- cinéma dont au moins une autre séance du même film a lieu dans une salle différente.
+-- Ne pas utiliser les clauses WHERE ou HAVING.
+SELECT Film.titre,
+       Film.annee,
+       Realisateur.nom,
+       Realisateur.prenom
+FROM Film
+    INNER JOIN Realisateur
+        ON Film.idRealisateur = Realisateur.id
+    INNER JOIN Seance
+        ON Film.id = Seance.idFilm AND
+           (Film.id, 1) NOT IN (
+               SELECT idFilm, COUNT(Seance.id)
+               FROM Seance
+               GROUP BY idFilm
+           )
+    INNER JOIN Salle
+        ON Seance.idCinema = Salle.idCinema AND
+           Seance.noSalle = Salle.noSalle
+    INNER JOIN Cinema
+        ON Salle.idCinema = Cinema.id
+GROUP BY Film.titre, Film.annee, Realisateur.nom, Realisateur.prenom;
+
+
+-- REQUÊTE DAVID APROVED
+SELECT Film.titre
+FROM Film
+    INNER JOIN Realisateur
+        ON Film.idRealisateur = Realisateur.id
+    INNER JOIN Seance
+        ON Film.id = Seance.idFilm
+    INNER JOIN Salle
+        ON Seance.idCinema = Salle.idCinema AND
+           Seance.noSalle = Salle.noSalle
+    INNER JOIN Cinema
+        ON Salle.idCinema = Cinema.id
+GROUP BY Film.titre
+ORDER BY (COUNT(Seance.id) > 1) DESC LIMIT 6;
+
 -- 14
 -- Pour chaque cinéma (localité et nom), indiquer le nombre de salles de cinéma, la capacité
 -- moyenne (2 digits de précision) et s'il existe des séances à moins de 12 CHF. Utiliser
@@ -221,3 +263,5 @@ FROM Cinema
         AND Seance.tarif < 12
 GROUP BY Cinema.localite, Cinema.nom
 
+SELECT *
+FROM Salle
