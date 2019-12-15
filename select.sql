@@ -70,7 +70,21 @@ FROM Seance
     JOIN Cinema
         ON Seance.idCinema = Cinema.id
 WHERE Realisateur.nom = 'Moore'
-    AND Realisateur.prenom = 'Michael'
+    AND Realisateur.prenom = 'Michael';
 
+-- 6.
+-- Indiquer le(s) cinéma(s) (nom, localité) ayant projeté des films dont la différence
+-- d’années entre le plus ancien et le plus récent est d’au moins 20 ans. Trié par localité, puis
+-- nom. Utiliser le prédicat EXISTS.
 
-
+SELECT nom,
+       localite
+FROM Cinema
+WHERE EXISTS(
+    SELECT any_value(Film.id)
+    FROM Film
+        INNER JOIN Seance
+            ON Film.id = Seance.idFilm
+    WHERE Cinema.id = Seance.idCinema
+    HAVING MAX(Film.annee) - MIN(Film.annee) >= 20
+);
