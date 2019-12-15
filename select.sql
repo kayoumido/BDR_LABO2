@@ -129,3 +129,13 @@ FROM Salle
         ON Seance.idFilm = Film.id
 GROUP BY Cinema.nom, Salle.noSalle;
 
+-- 9
+-- Lister tous les films projetés dans au moins 3 salles différentes
+
+SELECT Film.titre
+FROM Film
+    JOIN Seance
+        ON Film.id = Seance.idFilm
+GROUP BY Film.titre
+HAVING COUNT(DISTINCT Seance.idFilm, Seance.idCinema, Seance.noSalle) >= 3;
+
