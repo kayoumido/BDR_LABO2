@@ -139,3 +139,17 @@ FROM Film
 GROUP BY Film.titre
 HAVING COUNT(DISTINCT Seance.idFilm, Seance.idCinema, Seance.noSalle) >= 3;
 
+-- 11
+-- Indiquer les séances dont le prix est supérieur au tarif moyen des séances pour un même
+-- film.
+
+-- TRES MOCHE MAIS FONCTIONNE JE CROIS
+
+SELECT Seance.id
+FROM Seance
+    JOIN (SELECT idFilm, AVG(tarif) AS moyenne
+              FROM Seance
+              GROUP BY idFilm) AS S_AVG
+          ON Seance.idFilm = S_AVG.idFilm
+WHERE Seance.tarif > S_AVG.moyenne;
+
