@@ -213,6 +213,26 @@ SELECT Film.titre,
        Realisateur.prenom
 FROM Film
     JOIN Realisateur
+        ON Realisateur.id = Film.idRealisateur
+    JOIN Seance AS S1
+        ON S1.idFilm = Film.id
+    JOIN Seance AS S2
+        ON S1.id <> S2.id AND
+           S1.idFilm = S2.idFilm AND (
+               S1.noSalle <> S2.noSalle OR
+               S1.idCinema <> S2.idCinema
+           )
+    JOIN Cinema
+        ON Cinema.id = S1.idCinema
+GROUP BY Film.id, Film.titre;
+
+/* OLD VERSION THAT DOESN'T FULLY WORK
+SELECT Film.titre,
+       Film.annee,
+       Realisateur.nom,
+       Realisateur.prenom
+FROM Film
+    JOIN Realisateur
         ON Film.idRealisateur = Realisateur.id
     JOIN Seance
         ON Film.id = Seance.idFilm AND
@@ -228,7 +248,6 @@ FROM Film
         ON Salle.idCinema = Cinema.id
 GROUP BY Film.titre, Film.annee, Realisateur.nom, Realisateur.prenom;
 
-
 -- REQUÊTE DAVID APROVED
 SELECT Film.titre
 FROM Film
@@ -243,6 +262,7 @@ FROM Film
         ON Salle.idCinema = Cinema.id
 GROUP BY Film.titre
 ORDER BY (COUNT(Seance.id) > 1) DESC LIMIT 6;
+*/
 
 -- 14
 -- Pour chaque cinéma (localité et nom), indiquer le nombre de salles de cinéma, la capacité
