@@ -118,13 +118,14 @@ WHERE Salle.capacite > 100;
 -- différents, ainsi que le nombre d’heures de début de séance différentes.
 SELECT Cinema.nom,
        Salle.noSalle,
-       COUNT(Film.id)           AS 'nbFIlms',
+       COUNT(Film.id)           AS 'nbFilms',
        COUNT(Seance.dateHeure)  AS 'nbHeureDebut'
 FROM Salle
     INNER JOIN Cinema
         ON Salle.idCinema = Cinema.id
     INNER JOIN Seance
-        ON Salle.idCinema = Seance.idCinema AND Salle.noSalle = Seance.noSalle
+        ON Salle.idCinema = Seance.idCinema
+        AND Salle.noSalle = Seance.noSalle
     INNER JOIN Film
         ON Seance.idFilm = Film.id
 GROUP BY Cinema.nom, Salle.noSalle;
@@ -186,3 +187,17 @@ FROM Seance
               GROUP BY idFilm) AS S_AVG
           ON Seance.idFilm = S_AVG.idFilm
 WHERE Seance.tarif > S_AVG.moyenne;
+
+-- 12 En considérant un taux de remplissage uniforme de 50%, indiquer les films (titre et
+-- année) dans l’ordre décroissant de leur chiffre d’affaire. Lister au maximum 20 films.
+
+SELECT Film.titre,
+       Film.annee
+FROM Film
+    JOIN Seance
+        ON Film.id = Seance.idFilm
+    JOIN Salle
+        ON Seance.noSalle = Salle.noSalle
+        AND Seance.idCinema = Salle.idCinema
+GROUP BY Film.titre, Film.annee
+ORDER BY SUM(Salle.capacite * Seance.tarif * 0.5) DESC LIMIT 20;
