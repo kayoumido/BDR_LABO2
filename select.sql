@@ -81,7 +81,7 @@ SELECT nom,
        localite
 FROM Cinema
 WHERE EXISTS(
-    SELECT any_value(Film.id)
+    SELECT ANY_VALUE(Film.id)
     FROM Film
         INNER JOIN Seance
             ON Film.id = Seance.idFilm
@@ -111,4 +111,21 @@ SELECT DISTINCT Cinema.nom,
 FROM Cinema
     JOIN Salle
         ON Cinema.id = Salle.idCinema
-WHERE Salle.capacite > 100
+WHERE Salle.capacite > 100;
+
+-- 8.
+-- Pour chaque salle de cinéma de Lausanne (nom et numéro), indiquer le nombre de films
+-- différents, ainsi que le nombre d’heures de début de séance différentes.
+SELECT Cinema.nom,
+       Salle.noSalle,
+       COUNT(Film.id)           AS 'nbFIlms',
+       COUNT(Seance.dateHeure)  AS 'nbHeureDebut'
+FROM Salle
+    INNER JOIN Cinema
+        ON Salle.idCinema = Cinema.id
+    INNER JOIN Seance
+        ON Salle.idCinema = Seance.idCinema AND Salle.noSalle = Seance.noSalle
+    INNER JOIN Film
+        ON Seance.idFilm = Film.id
+GROUP BY Cinema.nom, Salle.noSalle;
+
