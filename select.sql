@@ -253,7 +253,7 @@ SELECT Cinema.localite,
        Cinema.nom,
        ROUND(AVG(Salle.capacite), 2) AS 'moyenneCapacite',
        -- on peut utiliser max ou any value ou min c'est égal
-       MAX(Seance.tarif) IS NOT NULL AS 'aSeanceMoinsDe12Frs'
+       ANY_VALUE(Seance.tarif) IS NOT NULL AS 'aSeanceMoinsDe12Frs'
 FROM Cinema
     JOIN Salle
         ON Cinema.id = Salle.idCinema
