@@ -285,7 +285,7 @@ GROUP BY Cinema.localite, Cinema.nom;
 
 -- 15.
 -- Vérifier qu'une salle ne projette jamais plusieurs films de 2004 simultanément.
-SELECT Cinema.nom, Seance.noSalle, (COUNT(*) > 1) as 'Seance simultanée'
+SELECT Cinema.nom, Seance.noSalle, (COUNT(*) > 1) as 'seanceSimultanee'
 FROM Seance
     JOIN Film
         ON Seance.idFilm = Film.id
@@ -295,4 +295,10 @@ FROM Seance
     JOIN Cinema
         ON Salle.idCinema = Cinema.id
 WHERE Film.annee = 2004
-GROUP BY noSalle, Seance.idCinema, dateHeure
+GROUP BY noSalle, Seance.idCinema, dateHeure;
+
+/*
+ TODO
+ Quoi afficher pour la requête 15?
+ Autorisation d'utiliser `ANY_VALUE`
+ */
