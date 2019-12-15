@@ -121,12 +121,12 @@ SELECT Cinema.nom,
        COUNT(Film.id)           AS 'nbFilms',
        COUNT(Seance.dateHeure)  AS 'nbHeureDebut'
 FROM Salle
-    INNER JOIN Cinema
+    JOIN Cinema
         ON Salle.idCinema = Cinema.id
-    INNER JOIN Seance
+    JOIN Seance
         ON Salle.idCinema = Seance.idCinema
         AND Salle.noSalle = Seance.noSalle
-    INNER JOIN Film
+    JOIN Film
         ON Seance.idFilm = Film.id
 GROUP BY Cinema.nom, Salle.noSalle;
 
@@ -151,13 +151,13 @@ SELECT Film.titre,
        Seance.dateHeure,
        Seance.tarif
 FROM Seance
-    INNER JOIN Film
+    JOIN Film
         ON Seance.idFilm = Film.id
-    INNER JOIN Realisateur
+    JOIN Realisateur
         ON Film.idRealisateur = Realisateur.id
-    INNER JOIN Salle
+    JOIN Salle
         ON Seance.idCinema = Salle.idCinema AND Seance.noSalle = Salle.noSalle
-    INNER JOIN Cinema
+    JOIN Cinema
         ON Salle.idCinema = Cinema.id
 WHERE Realisateur.nom = 'Spielberg' AND
       Realisateur.prenom = 'Steven' AND
@@ -212,19 +212,19 @@ SELECT Film.titre,
        Realisateur.nom,
        Realisateur.prenom
 FROM Film
-    INNER JOIN Realisateur
+    JOIN Realisateur
         ON Film.idRealisateur = Realisateur.id
-    INNER JOIN Seance
+    JOIN Seance
         ON Film.id = Seance.idFilm AND
            (Film.id, 1) NOT IN (
                SELECT idFilm, COUNT(Seance.id)
                FROM Seance
                GROUP BY idFilm
            )
-    INNER JOIN Salle
+    JOIN Salle
         ON Seance.idCinema = Salle.idCinema AND
            Seance.noSalle = Salle.noSalle
-    INNER JOIN Cinema
+    JOIN Cinema
         ON Salle.idCinema = Cinema.id
 GROUP BY Film.titre, Film.annee, Realisateur.nom, Realisateur.prenom;
 
@@ -232,14 +232,14 @@ GROUP BY Film.titre, Film.annee, Realisateur.nom, Realisateur.prenom;
 -- REQUÊTE DAVID APROVED
 SELECT Film.titre
 FROM Film
-    INNER JOIN Realisateur
+    JOIN Realisateur
         ON Film.idRealisateur = Realisateur.id
-    INNER JOIN Seance
+    JOIN Seance
         ON Film.id = Seance.idFilm
-    INNER JOIN Salle
+    JOIN Salle
         ON Seance.idCinema = Salle.idCinema AND
            Seance.noSalle = Salle.noSalle
-    INNER JOIN Cinema
+    JOIN Cinema
         ON Salle.idCinema = Cinema.id
 GROUP BY Film.titre
 ORDER BY (COUNT(Seance.id) > 1) DESC LIMIT 6;
@@ -261,7 +261,18 @@ FROM Cinema
         ON Salle.idCinema = Seance.idCinema
         AND Salle.noSalle = Seance.noSalle
         AND Seance.tarif < 12
-GROUP BY Cinema.localite, Cinema.nom
+GROUP BY Cinema.localite, Cinema.nom;
 
-SELECT *
-FROM Salle
+-- 15.
+-- Vérifier qu'une salle ne projette jamais plusieurs films de 2004 simultanément.
+SELECT Cinema.nom, Seance.noSalle, (COUNT(*) > 1) as 'Seance simultanée'
+FROM Seance
+    JOIN Film
+        ON Seance.idFilm = Film.id
+    JOIN Salle
+        ON Seance.idCinema = Salle.idCinema AND
+           Seance.noSalle = Salle.noSalle
+    JOIN Cinema
+        ON Salle.idCinema = Cinema.id
+WHERE Film.annee = 2004
+GROUP BY noSalle, Seance.idCinema, dateHeure
