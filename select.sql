@@ -43,8 +43,11 @@ WHERE HOUR(Seance.dateHeure) >= 20
 -- Pour chaque réalisateur (nom, prénom), indiquer l’âge qu’il avait lors de la réalisation de son
 -- premier film (âge à l’année civile courantedu film). Ordonner les résultats 1°) par ordre croissant
 -- d’âge lors dupremier film réalisé, 2°) par ordre croissant du nom, 3°) par ordre croissant du prénom.
-SELECT  nom
-        prenom
+SELECT  Realisateur.nom,
+        Realisateur.prenom,
+        (MIN(Film.annee) - Realisateur.anneeNaissance) AS age
 FROM Realisateur
     JOIN Film
         ON Realisateur.id = Film.idRealisateur
+GROUP BY Realisateur.nom, Realisateur.prenom, Realisateur.anneeNaissance
+ORDER BY age, Realisateur.nom, Realisateur.prenom;
