@@ -131,13 +131,47 @@ GROUP BY Cinema.nom, Salle.noSalle;
 
 -- 9
 -- Lister tous les films projetés dans au moins 3 salles différentes
-
 SELECT Film.titre
 FROM Film
     JOIN Seance
         ON Film.id = Seance.idFilm
 GROUP BY Film.titre
 HAVING COUNT(DISTINCT Seance.idFilm, Seance.idCinema, Seance.noSalle) >= 3;
+
+-- 10.
+-- Indiquer la(les) projection(s) programmée(s) (titre du film, nom et localité du cinéma,
+-- no de la salle, date, heure de début de la séance et tarif) où le tarif est le plus avantageux pour
+-- aller voir un film de Steven Spielberg. Classer les résultats par heure de début croissante.
+
+SELECT Film.titre,
+       Cinema.nom,
+       Cinema.localite,
+       Salle.noSalle,
+       Seance.dateHeure,
+       Seance.tarif
+FROM Seance
+    INNER JOIN Film
+        ON Seance.idFilm = Film.id
+    INNER JOIN Realisateur
+        ON Film.idRealisateur = Realisateur.id
+    INNER JOIN Salle
+        ON Seance.idCinema = Salle.idCinema AND Seance.noSalle = Salle.noSalle
+    INNER JOIN Cinema
+        ON Salle.idCinema = Cinema.id
+WHERE Realisateur.nom = 'Spielberg' AND
+      Realisateur.prenom = 'Steven' AND
+      Film.id IN (
+          SELECT Film.id
+          FROM Seance
+              INNER JOIN Salle
+                  ON Seance.idCinema = Salle.idCinema AND
+                     Seance.noSalle = Salle.noSalle
+              INNER JOIN Film
+                  ON Seance.idFilm = Film.id
+          GROUP BY idFilm
+          HAVING MIN(tarif)
+      )
+ORDER BY Seance.dateHeure;
 
 -- 11
 -- Indiquer les séances dont le prix est supérieur au tarif moyen des séances pour un même
@@ -152,4 +186,3 @@ FROM Seance
               GROUP BY idFilm) AS S_AVG
           ON Seance.idFilm = S_AVG.idFilm
 WHERE Seance.tarif > S_AVG.moyenne;
-
