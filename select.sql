@@ -218,10 +218,9 @@ FROM Film
         ON S1.idFilm = Film.id
     JOIN Seance AS S2
         ON S1.id <> S2.id AND
-           S1.idFilm = S2.idFilm AND (
-               S1.noSalle <> S2.noSalle OR
-               S1.idCinema <> S2.idCinema
-           )
+           S1.idFilm = S2.idFilm AND
+           S1.noSalle <> S2.noSalle AND
+           S1.idCinema = S2.idCinema
     JOIN Cinema
         ON Cinema.id = S1.idCinema
 GROUP BY Film.id, Film.titre;
