@@ -300,4 +300,5 @@ GROUP BY noSalle, Seance.idCinema, dateHeure;
  TODO
  Quoi afficher pour la requête 15?
  Autorisation d'utiliser `ANY_VALUE`
+ Clarification sur la N° 10
  */
