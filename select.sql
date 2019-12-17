@@ -81,11 +81,12 @@ SELECT nom,
        localite
 FROM Cinema
 WHERE EXISTS(
-    SELECT ANY_VALUE(Film.id)
+    SELECT Cinema.id
     FROM Film
         INNER JOIN Seance
             ON Film.id = Seance.idFilm
     WHERE Cinema.id = Seance.idCinema
+    GROUP BY Cinema.id
     HAVING MAX(Film.annee) - MIN(Film.annee) >= 20
 );
 
@@ -179,7 +180,6 @@ ORDER BY Seance.dateHeure;
 -- film.
 
 -- TRES MOCHE MAIS FONCTIONNE JE CROIS
-
 SELECT Seance.id
 FROM Seance
     JOIN (SELECT idFilm, AVG(tarif) AS moyenne
@@ -267,12 +267,11 @@ ORDER BY (COUNT(Seance.id) > 1) DESC LIMIT 6;
 -- Pour chaque cinéma (localité et nom), indiquer le nombre de salles de cinéma, la capacité
 -- moyenne (2 digits de précision) et s'il existe des séances à moins de 12 CHF. Utiliser
 -- un(des) LEFT JOIN (pas de EXISTS, ...)
-
 SELECT Cinema.localite,
        Cinema.nom,
+       COUNT(DISTINCT Salle.idCinema, Salle.noSalle) AS 'nbSalle',
        ROUND(AVG(Salle.capacite), 2) AS 'moyenneCapacite',
-       -- on peut utiliser max ou any value ou min c'est égal
-       ANY_VALUE(Seance.tarif) IS NOT NULL AS 'aSeanceMoinsDe12Frs'
+       Seance.tarif IS NOT NULL AS aSeanceMoinsDe12Frs
 FROM Cinema
     JOIN Salle
         ON Cinema.id = Salle.idCinema
@@ -280,7 +279,7 @@ FROM Cinema
         ON Salle.idCinema = Seance.idCinema
         AND Salle.noSalle = Seance.noSalle
         AND Seance.tarif < 12
-GROUP BY Cinema.localite, Cinema.nom;
+GROUP BY Cinema.localite, Cinema.nom, aSeanceMoinsDe12Frs;
 
 -- 15.
 -- Vérifier qu'une salle ne projette jamais plusieurs films de 2004 simultanément.
@@ -295,10 +294,3 @@ FROM Seance
         ON Salle.idCinema = Cinema.id
 WHERE Film.annee = 2004
 GROUP BY noSalle, Seance.idCinema, dateHeure;
-
-/*
- TODO
- Quoi afficher pour la requête 15?
- Autorisation d'utiliser `ANY_VALUE`
- Clarification sur la N° 10
- */
