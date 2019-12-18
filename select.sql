@@ -24,12 +24,11 @@ ORDER BY avgCapacity DESC;
 -- 3. 
 -- Indiquer toutes les séances (nom du cinéma, no de la salle, titre du film) ayant lieu à Yverdon-les-Bains, 
 --  qui coûtent moins de 15 CHF et qui ont lieu en soirée(à partir de 20h).
-SELECT Cinema.nom     AS 'cinema',
-       Seance.noSalle AS 'noSalle',
-       Film.titre     AS 'film',
-       Seance.dateHeure,
-       Seance.tarif,
-       Cinema.localite
+SELECT Cinema.nom     AS 'nomCinema',
+       Seance.noSalle,
+       Film.titre,
+       DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date',
+       DATE_FORMAT(Seance.dateHeure, '%H:%i') AS 'heureDebut'
 FROM Seance
     JOIN Film
         ON Seance.idFilm = Film.id
@@ -181,6 +180,7 @@ ORDER BY Seance.dateHeure;
 -- film.
 
 SELECT Cinema.nom,
+       Seance.noSalle,
        Film.titre,
        DATE_FORMAT(Seance.dateHeure, '%H:%i') AS 'heure',
        DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date',
