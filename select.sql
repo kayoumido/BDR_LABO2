@@ -82,7 +82,7 @@ FROM Cinema
 WHERE EXISTS(
     SELECT Seance.idCinema
     FROM Film
-        INNER JOIN Seance
+        JOIN Seance
             ON Film.id = Seance.idFilm
     WHERE Cinema.id = Seance.idCinema
     GROUP BY Seance.idCinema
@@ -166,10 +166,10 @@ WHERE Realisateur.nom = 'Spielberg' AND
       Film.id IN (
           SELECT Film.id
           FROM Seance
-              INNER JOIN Salle
+              JOIN Salle
                   ON Seance.idCinema = Salle.idCinema AND
                      Seance.noSalle = Salle.noSalle
-              INNER JOIN Film
+              JOIN Film
                   ON Seance.idFilm = Film.id
           GROUP BY Film.id
           HAVING MIN(tarif)
