@@ -118,16 +118,17 @@ WHERE Salle.capacite > 100;
 -- différents, ainsi que le nombre d’heures de début de séance différentes.
 SELECT Cinema.nom,
        Salle.noSalle,
-       COUNT(Film.id)           AS 'nbFilm',
-       COUNT(Seance.dateHeure)  AS 'nbHeureDebut'
+       COUNT(DISTINCT Cinema.nom, Salle.noSalle, Film.id)           AS 'nbFilm',
+       COUNT(DISTINCT Cinema.nom, Salle.noSalle, Seance.dateHeure)  AS 'nbHeureDebut'
 FROM Salle
     JOIN Cinema
         ON Salle.idCinema = Cinema.id
-    JOIN Seance
+    LEFT JOIN Seance
         ON Salle.idCinema = Seance.idCinema
         AND Salle.noSalle = Seance.noSalle
-    JOIN Film
+    LEFT JOIN Film
         ON Seance.idFilm = Film.id
+WHERE Cinema.localite = 'Lausanne'
 GROUP BY Cinema.nom, Salle.noSalle;
 
 -- 9
