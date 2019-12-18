@@ -24,7 +24,7 @@ ORDER BY avgCapacity DESC;
 -- 3. 
 -- Indiquer toutes les séances (nom du cinéma, no de la salle, titre du film) ayant lieu à Yverdon-les-Bains, 
 --  qui coûtent moins de 15 CHF et qui ont lieu en soirée(à partir de 20h).
-SELECT Cinema.nom     AS 'nomCinema',
+SELECT Cinema.nom AS 'nomCinema',
        Seance.noSalle,
        Film.titre,
        DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date',
@@ -75,7 +75,6 @@ WHERE Realisateur.nom = 'Moore'
 -- Indiquer le(s) cinéma(s) (nom, localité) ayant projeté des films dont la différence
 -- d’années entre le plus ancien et le plus récent est d’au moins 20 ans. Trié par localité, puis
 -- nom. Utiliser le prédicat EXISTS.
-
 SELECT Cinema.nom,
        Cinema.localite
 FROM Cinema
