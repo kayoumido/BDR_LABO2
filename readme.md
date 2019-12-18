@@ -67,7 +67,7 @@ WHERE HOUR(Seance.dateHeure) >= 20
 ```
 ###### Résultat :
 | cinema | noSalle | titre | date | hereDebut |
-| :--- | :--- | :--- | :--- | :--- | :--- |
+| :--- | :--- | :--- | :--- | :--- |
 | Bel air | 1 | Indiana Jones and the Temple of Doom | 18.11.2004 | 20:00 |
 | Rex | 1 | Alien vs Predator | 15.11.2004 | 20:00:00 |
 | Rex | 1 | Kukushka | 15.11.2004 | 20:00 |
@@ -271,7 +271,7 @@ ORDER BY Seance.dateHeure;
 ```
 ###### Résultat :
 | titre | nom | localite | noSalle | heure | date | tarif |
-| :--- | :--- | :--- | :--- | :--- | :--- |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | Indiana Jones and the Temple of Doom | Bel air | Yverdon-les-Bains | 1 | 18.11.2004 | 20:00 | 10 |
 | Indiana Jones and the Temple of Doom | Rex | Yverdon-les-Bains | 1 | 18.11.2004 | 22:00 | 10 |
 | Jurassic Park | Capitol | Yverdon-les-Bains | 1 | 18.11.2004 | 22:00 | 10 |
@@ -304,12 +304,12 @@ WHERE Seance.tarif > (
 );
 ```
 ###### Résultat :
-| nom | noSalle | titre | heure | date | tarif |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| Europlex Flon | 3 | Indiana Jones and the Temple of Doom | 18:00 | 19.11.2004 | 16 |
-| Cinétoile Malley | 4 | Shrek 2 | 18:00 | 17.11.2004 | 16 |
-| Cinétoile Malley | 5 | Bowling for Columbine | 20:00 | 18.11.2004 | 16 |
-| Cinétoile Malley | 5 | Jurassic Park | 22:00 | 20.11.2004 | 14 |
+| nom               | noSalle   | titre | heure | date | tarif |
+| :---              | :---      | :--- | :--- | :--- | :--- |
+| Europlex Flon     | 3     | Indiana Jones and the Temple of Doom | 18:00 | 19.11.2004 | 16 |
+| Cinétoile Malley  | 4     | Shrek 2 | 18:00 | 17.11.2004 | 16 |
+| Cinétoile Malley  | 5     | Bowling for Columbine | 20:00 | 18.11.2004 | 16 |
+| Cinétoile Malley  | 5     | Jurassic Park | 22:00 | 20.11.2004 | 14 |
 
 
 ##### 12.  En considérant un taux de remplissage uniforme de 50%, indiquer les films (titre et année) dans l’ordre décroissant de leur chiffre d’affaire. Lister au maximum 20 films.
@@ -413,7 +413,7 @@ HAVING COUNT(Seance.id) > 1;
 ###### Résultat :
 | nom | noSalle | heure | date |
 | :--- | :--- | :--- | :--- |
-| Rex | 1 | 20:00 | 15.11.204
+| Rex | 1 | 20:00 | 15.11.2004 |
 
 ###### Remarques
 Normalement, une telle requête devrait ne rien retourné car il n'est pas possible qu'une salle puisse projeter plusieurs films simultanément. Malheureusement, notre requête nous retourne une résultat  un résultat ce qu'il y a possiblement une incohérence dans la base de données.
