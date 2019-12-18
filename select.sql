@@ -77,19 +77,19 @@ WHERE Realisateur.nom = 'Moore'
 -- d’années entre le plus ancien et le plus récent est d’au moins 20 ans. Trié par localité, puis
 -- nom. Utiliser le prédicat EXISTS.
 
-SELECT nom,
-       localite
+SELECT Cinema.nom,
+       Cinema.localite
 FROM Cinema
 WHERE EXISTS(
-    SELECT Cinema.id
+    SELECT Seance.idCinema
     FROM Film
         INNER JOIN Seance
             ON Film.id = Seance.idFilm
     WHERE Cinema.id = Seance.idCinema
-    GROUP BY Cinema.id
+    GROUP BY Seance.idCinema
     HAVING MAX(Film.annee) - MIN(Film.annee) >= 20
-);
-
+)
+ORDER BY Cinema.localite, Cinema.nom;
 -- 7
 -- Lister les cinémas (nom et localité) projetant des films réalisés par Michael Moore ou
 -- possédant une salle avec une capacité supérieure à 100 places. Utiliser l’opérateur
@@ -119,7 +119,7 @@ WHERE Salle.capacite > 100;
 -- différents, ainsi que le nombre d’heures de début de séance différentes.
 SELECT Cinema.nom,
        Salle.noSalle,
-       COUNT(Film.id)           AS 'nbFilms',
+       COUNT(Film.id)           AS 'nbFilm',
        COUNT(Seance.dateHeure)  AS 'nbHeureDebut'
 FROM Salle
     JOIN Cinema
@@ -149,7 +149,8 @@ SELECT Film.titre,
        Cinema.nom,
        Cinema.localite,
        Salle.noSalle,
-       Seance.dateHeure,
+       DATE_FORMAT(Seance.dateHeure, '%H:%i') AS 'heure',
+       DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date',
        Seance.tarif
 FROM Seance
     JOIN Film
@@ -170,7 +171,7 @@ WHERE Realisateur.nom = 'Spielberg' AND
                      Seance.noSalle = Salle.noSalle
               INNER JOIN Film
                   ON Seance.idFilm = Film.id
-          GROUP BY idFilm
+          GROUP BY Film.id
           HAVING MIN(tarif)
       )
 ORDER BY Seance.dateHeure;
@@ -179,14 +180,22 @@ ORDER BY Seance.dateHeure;
 -- Indiquer les séances dont le prix est supérieur au tarif moyen des séances pour un même
 -- film.
 
--- TRES MOCHE MAIS FONCTIONNE JE CROIS
-SELECT Seance.id
-FROM Seance
-    JOIN (SELECT idFilm, AVG(tarif) AS moyenne
-              FROM Seance
-              GROUP BY idFilm) AS S_AVG
-          ON Seance.idFilm = S_AVG.idFilm
-WHERE Seance.tarif > S_AVG.moyenne;
+SELECT Cinema.nom,
+       Film.titre,
+       DATE_FORMAT(Seance.dateHeure, '%H:%i') AS 'heure',
+       DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date',
+       Seance.tarif
+FROM Film
+    JOIN Seance
+        ON Film.id = Seance.idFilm
+    JOIN Cinema -- Utilisé pour afficher plus clairement les résulats
+        ON Seance.idCinema = Cinema.id
+WHERE Seance.tarif > (
+    SELECT AVG(tarif)
+    FROM Seance
+    WHERE Seance.idFilm = Film.id
+);
+
 
 -- 12 En considérant un taux de remplissage uniforme de 50%, indiquer les films (titre et
 -- année) dans l’ordre décroissant de leur chiffre d’affaire. Lister au maximum 20 films.
@@ -225,44 +234,6 @@ FROM Film
         ON Cinema.id = S1.idCinema
 GROUP BY Film.id, Film.titre;
 
-/* OLD VERSION THAT DOESN'T FULLY WORK
-SELECT Film.titre,
-       Film.annee,
-       Realisateur.nom,
-       Realisateur.prenom
-FROM Film
-    JOIN Realisateur
-        ON Film.idRealisateur = Realisateur.id
-    JOIN Seance
-        ON Film.id = Seance.idFilm AND
-           (Film.id, 1) NOT IN (
-               SELECT idFilm, COUNT(Seance.id)
-               FROM Seance
-               GROUP BY idFilm
-           )
-    JOIN Salle
-        ON Seance.idCinema = Salle.idCinema AND
-           Seance.noSalle = Salle.noSalle
-    JOIN Cinema
-        ON Salle.idCinema = Cinema.id
-GROUP BY Film.titre, Film.annee, Realisateur.nom, Realisateur.prenom;
-
--- REQUÊTE DAVID APROVED
-SELECT Film.titre
-FROM Film
-    JOIN Realisateur
-        ON Film.idRealisateur = Realisateur.id
-    JOIN Seance
-        ON Film.id = Seance.idFilm
-    JOIN Salle
-        ON Seance.idCinema = Salle.idCinema AND
-           Seance.noSalle = Salle.noSalle
-    JOIN Cinema
-        ON Salle.idCinema = Cinema.id
-GROUP BY Film.titre
-ORDER BY (COUNT(Seance.id) > 1) DESC LIMIT 6;
-*/
-
 -- 14
 -- Pour chaque cinéma (localité et nom), indiquer le nombre de salles de cinéma, la capacité
 -- moyenne (2 digits de précision) et s'il existe des séances à moins de 12 CHF. Utiliser
@@ -283,10 +254,15 @@ GROUP BY Cinema.localite, Cinema.nom, aSeanceMoinsDe12Frs;
 
 -- 15.
 -- Vérifier qu'une salle ne projette jamais plusieurs films de 2004 simultanément.
-SELECT Seance.idCinema, Seance.noSalle, Seance.dateHeure
+SELECT Cinema.nom,
+       Seance.noSalle,
+       DATE_FORMAT(Seance.dateHeure, '%H:%i') AS 'heure',
+       DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date'
 FROM Seance
     JOIN Film
         ON Seance.idFilm = Film.id
+    JOIN Cinema -- Uniquement pour un affichage plus clair
+        ON Seance.idCinema = Cinema.id
 WHERE Film.annee = 2004
 GROUP BY Seance.idCinema, Seance.noSalle, Seance.dateHeure
 HAVING COUNT(Seance.id) > 1;
