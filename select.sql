@@ -147,7 +147,7 @@ HAVING COUNT(DISTINCT Seance.idFilm, Seance.idCinema, Seance.noSalle) >= 3;
 SELECT Film.titre,
        Cinema.nom,
        Cinema.localite,
-       Salle.noSalle,
+       Seance.noSalle,
        DATE_FORMAT(Seance.dateHeure, '%H:%i') AS 'heure',
        DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date',
        Seance.tarif
@@ -156,22 +156,14 @@ FROM Seance
         ON Seance.idFilm = Film.id
     JOIN Realisateur
         ON Film.idRealisateur = Realisateur.id
-    JOIN Salle
-        ON Seance.idCinema = Salle.idCinema AND Seance.noSalle = Salle.noSalle
     JOIN Cinema
-        ON Salle.idCinema = Cinema.id
-WHERE Realisateur.nom = 'Spielberg' AND
-      Realisateur.prenom = 'Steven' AND
-      Film.id IN (
-          SELECT Film.id
+        ON Seance.idCinema = Cinema.id
+WHERE (Realisateur.nom, Realisateur.prenom) = ('Spielberg', 'Steven') AND
+      (Film.id, Seance.tarif) IN (
+          SELECT Seance.idFilm, MIN(tarif)
           FROM Seance
-              JOIN Salle
-                  ON Seance.idCinema = Salle.idCinema AND
-                     Seance.noSalle = Salle.noSalle
-              JOIN Film
-                  ON Seance.idFilm = Film.id
-          GROUP BY Film.id
-          HAVING MIN(tarif)
+          WHERE Seance.idFilm = Film.id
+          GROUP BY Seance.idFilm
       )
 ORDER BY Seance.dateHeure;
 
