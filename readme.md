@@ -69,7 +69,7 @@ WHERE HOUR(Seance.dateHeure) >= 20
 | cinema | noSalle | titre | date | hereDebut |
 | :--- | :--- | :--- | :--- | :--- |
 | Bel air | 1 | Indiana Jones and the Temple of Doom | 18.11.2004 | 20:00 |
-| Rex | 1 | Alien vs Predator | 15.11.2004 | 20:00:00 |
+| Rex | 1 | Alien vs Predator | 15.11.2004 | 20:00 |
 | Rex | 1 | Kukushka | 15.11.2004 | 20:00 |
 | Rex | 1 | Indiana Jones and the Temple of Doom | 18.11.2004 | 22:00 |
 | Capitol | 1 | Jurassic Park | 18.11.2004 | 22:00 |

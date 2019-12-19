@@ -10,7 +10,7 @@ WHERE Realisateur.nom = 'Spielberg'
   AND Realisateur.prenom = 'Steven';
 
 -- 2.
-SELECT titre, ROUND(AVG(Salle.capacite), 2) AS avgCapacity
+SELECT Film.titre, ROUND(AVG(Salle.capacite), 2) AS avgCapacity
 FROM Film
     JOIN Seance
         ON Seance.idFilm = Film.id
@@ -48,8 +48,9 @@ SELECT  Realisateur.nom,
 FROM Realisateur
     JOIN Film
         ON Realisateur.id = Film.idRealisateur
-GROUP BY Realisateur.nom, Realisateur.prenom, Realisateur.anneeNaissance
+GROUP BY Realisateur.id
 ORDER BY age, Realisateur.nom, Realisateur.prenom;
+
 
 -- 5.
 -- Lister le programme complet concernant les films de Michael Moore (date de la séance,
@@ -75,6 +76,7 @@ WHERE Realisateur.nom = 'Moore'
 -- Indiquer le(s) cinéma(s) (nom, localité) ayant projeté des films dont la différence
 -- d’années entre le plus ancien et le plus récent est d’au moins 20 ans. Trié par localité, puis
 -- nom. Utiliser le prédicat EXISTS.
+
 SELECT Cinema.nom,
        Cinema.localite
 FROM Cinema
@@ -88,13 +90,18 @@ WHERE EXISTS(
     HAVING MAX(Film.annee) - MIN(Film.annee) >= 20
 )
 ORDER BY Cinema.localite, Cinema.nom;
+
 -- 7
 -- Lister les cinémas (nom et localité) projetant des films réalisés par Michael Moore ou
 -- possédant une salle avec une capacité supérieure à 100 places. Utiliser l’opérateur
 -- UNION.
 
-SELECT DISTINCT Cinema.nom,
-                Cinema.localite
+-- Pas de distinct car si deux cinemas ont le même nom et
+-- sont dans la même ville, ce sont quand même deux cinémas
+-- différents. Il faudrait pas les éliminer des résultats
+
+SELECT Cinema.nom,
+       Cinema.localite
 FROM Cinema
     JOIN Seance
         ON Cinema.id = Seance.idCinema
@@ -117,8 +124,8 @@ WHERE Salle.capacite > 100;
 -- différents, ainsi que le nombre d’heures de début de séance différentes.
 SELECT Cinema.nom,
        Salle.noSalle,
-       COUNT(DISTINCT Cinema.nom, Salle.noSalle, Film.id)           AS 'nbFilm',
-       COUNT(DISTINCT Cinema.nom, Salle.noSalle, Seance.dateHeure)  AS 'nbHeureDebut'
+       COUNT(DISTINCT Cinema.id, Salle.noSalle, Film.id)           AS 'nbFilm',
+       COUNT(DISTINCT Cinema.id, Salle.noSalle, Seance.dateHeure)  AS 'nbHeureDebut'
 FROM Salle
     JOIN Cinema
         ON Salle.idCinema = Cinema.id
@@ -128,10 +135,11 @@ FROM Salle
     LEFT JOIN Film
         ON Seance.idFilm = Film.id
 WHERE Cinema.localite = 'Lausanne'
-GROUP BY Cinema.nom, Salle.noSalle;
+GROUP BY Cinema.id, Salle.noSalle;
 
 -- 9
 -- Lister tous les films projetés dans au moins 3 salles différentes
+
 SELECT Film.titre
 FROM Film
     JOIN Seance
@@ -148,7 +156,7 @@ SELECT Film.titre,
        Cinema.nom,
        Cinema.localite,
        Seance.noSalle,
-       DATE_FORMAT(Seance.dateHeure, '%H:%i') AS 'heure',
+       DATE_FORMAT(Seance.dateHeure, '%H:%i') AS heure,
        DATE_FORMAT(Seance.dateHeure, '%d.%m.%Y') AS 'date',
        Seance.tarif
 FROM Seance
@@ -165,7 +173,7 @@ WHERE (Realisateur.nom, Realisateur.prenom) = ('Spielberg', 'Steven') AND
           WHERE Seance.idFilm = Film.id
           GROUP BY Seance.idFilm
       )
-ORDER BY Seance.dateHeure;
+ORDER BY heure;
 
 -- 11
 -- Indiquer les séances dont le prix est supérieur au tarif moyen des séances pour un même
@@ -200,7 +208,7 @@ FROM Film
     JOIN Salle
         ON Seance.noSalle = Salle.noSalle
         AND Seance.idCinema = Salle.idCinema
-GROUP BY Film.titre, Film.annee
+GROUP BY Film.id
 ORDER BY SUM(Salle.capacite * Seance.tarif * 0.5) DESC LIMIT 20;
 
 
@@ -208,6 +216,7 @@ ORDER BY SUM(Salle.capacite * Seance.tarif * 0.5) DESC LIMIT 20;
 -- Lister tous les films (titre, année, nom et prénom du réalisateur) qui sont projetés dans un
 -- cinéma dont au moins une autre séance du même film a lieu dans une salle différente.
 -- Ne pas utiliser les clauses WHERE ou HAVING.
+
 SELECT Film.titre,
        Film.annee,
        Realisateur.nom,
@@ -224,7 +233,7 @@ FROM Film
            S1.idCinema = S2.idCinema
     JOIN Cinema
         ON Cinema.id = S1.idCinema
-GROUP BY Film.id, Film.titre;
+GROUP BY Film.id;
 
 -- 14
 -- Pour chaque cinéma (localité et nom), indiquer le nombre de salles de cinéma, la capacité
@@ -242,7 +251,7 @@ FROM Cinema
         ON Salle.idCinema = Seance.idCinema
         AND Salle.noSalle = Seance.noSalle
         AND Seance.tarif < 12
-GROUP BY Cinema.localite, Cinema.nom, aSeanceMoinsDe12Frs;
+GROUP BY Cinema.id, aSeanceMoinsDe12Frs;
 
 -- 15.
 -- Vérifier qu'une salle ne projette jamais plusieurs films de 2004 simultanément.
